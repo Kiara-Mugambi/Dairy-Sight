@@ -1,64 +1,82 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Droplets, Shield, Users } from 'lucide-react'
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Droplets, Eye, EyeOff, AlertCircle } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
     setIsLoading(true)
 
-    // Simulate login process
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-    // Route based on email (demo purposes)
-    if (email.includes("admin")) {
-      router.push("/admin")
-    } else if (email.includes("employee")) {
-      router.push("/employee")
-    } else {
-      router.push("/employee") // Default to employee dashboard
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        // Store user info in localStorage (in production, use proper session management)
+        localStorage.setItem("user", JSON.stringify(data.user))
+
+        // Redirect based on role
+        if (data.user.role === "admin") {
+          router.push("/admin")
+        } else {
+          router.push("/employee")
+        }
+      } else {
+        setError(data.error || "Login failed")
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      setError("Network error. Please try again.")
+    } finally {
+      setIsLoading(false)
     }
-    
-    setIsLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Droplets className="h-10 w-10 text-blue-600" />
-            <span className="text-3xl font-bold text-gray-900">DairySight</span>
+            <h1 className="text-3xl font-bold text-gray-900">DairySight</h1>
           </div>
-          <p className="text-gray-600">Sign in to your cooperative account</p>
+          <p className="text-gray-600">Sign in to your account</p>
         </div>
 
-        <Card className="shadow-xl border-0">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
-              Enter your credentials to access your dashboard
-            </CardDescription>
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome Back</CardTitle>
+            <CardDescription>Enter your credentials to access the dashboard</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -66,9 +84,9 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11"
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -79,7 +97,6 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-11 pr-10"
                   />
                   <Button
                     type="button"
@@ -96,48 +113,41 @@ export default function LoginPage() {
                   </Button>
                 </div>
               </div>
-              <Button type="submit" className="w-full h-11" disabled={isLoading}>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
 
-            <div className="mt-6">
-              <div className="text-center text-sm text-gray-500 mb-4">Demo Accounts</div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-red-600" />
-                    <span className="text-sm font-medium">Admin Access</span>
-                  </div>
-                  <Badge variant="outline" className="text-xs">admin@dairy.com</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium">Employee Access</span>
-                  </div>
-                  <Badge variant="outline" className="text-xs">employee@dairy.com</Badge>
-                </div>
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-medium text-gray-900 mb-2">Demo Credentials:</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p>
+                  <strong>Admin:</strong> admin@dairy.com / admin123
+                </p>
+                <p>
+                  <strong>Employee:</strong> employee@dairy.com / emp123
+                </p>
               </div>
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600 mb-2">
+              <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-blue-600 hover:underline font-medium">
-                  Sign up here
+                <Link href="/signup" className="text-blue-600 hover:underline">
+                  Sign up
                 </Link>
               </p>
-              <a href="#" className="text-sm text-blue-600 hover:underline">
-                Forgot your password?
-              </a>
             </div>
           </CardContent>
         </Card>
-
-        <div className="mt-6 text-center text-xs text-gray-500">
-          <p>© 2024 DairySight. All rights reserved.</p>
-        </div>
       </div>
     </div>
   )

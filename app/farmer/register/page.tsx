@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Upload, Check, Droplets } from 'lucide-react'
+import { ArrowLeft, Upload, Check, Droplets, CheckCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -336,28 +336,82 @@ export default function FarmerRegistration() {
                 <div className="space-y-4">
                   <h4 className="font-medium">Required Documents</h4>
                   
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  {/* National ID Upload */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
                     <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600 mb-2">National ID Copy *</p>
-                    <Button variant="outline" size="sm">
-                      Choose File
+                    <input
+                      type="file"
+                      id="idCopy"
+                      accept="image/*,.pdf"
+                      onChange={(e) => handleFileUpload('idCopy', e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => document.getElementById('idCopy')?.click()}
+                      type="button"
+                    >
+                      {formData.idCopy ? 'Change File' : 'Choose File'}
                     </Button>
+                    {formData.idCopy && (
+                      <p className="text-xs text-green-600 mt-2">
+                        ✓ {formData.idCopy.name} selected
+                      </p>
+                    )}
                   </div>
 
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  {/* Farm Certificate Upload */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
                     <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600 mb-2">Farm Certificate (Optional)</p>
-                    <Button variant="outline" size="sm">
-                      Choose File
+                    <input
+                      type="file"
+                      id="farmCertificate"
+                      accept="image/*,.pdf"
+                      onChange={(e) => handleFileUpload('farmCertificate', e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => document.getElementById('farmCertificate')?.click()}
+                      type="button"
+                    >
+                      {formData.farmCertificate ? 'Change File' : 'Choose File'}
                     </Button>
+                    {formData.farmCertificate && (
+                      <p className="text-xs text-green-600 mt-2">
+                        ✓ {formData.farmCertificate.name} selected
+                      </p>
+                    )}
                   </div>
 
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  {/* Bank Statement Upload */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
                     <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600 mb-2">Bank Statement (Optional)</p>
-                    <Button variant="outline" size="sm">
-                      Choose File
+                    <input
+                      type="file"
+                      id="bankStatement"
+                      accept="image/*,.pdf"
+                      onChange={(e) => handleFileUpload('bankStatement', e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => document.getElementById('bankStatement')?.click()}
+                      type="button"
+                    >
+                      {formData.bankStatement ? 'Change File' : 'Choose File'}
                     </Button>
+                    {formData.bankStatement && (
+                      <p className="text-xs text-green-600 mt-2">
+                        ✓ {formData.bankStatement.name} selected
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -373,6 +427,8 @@ export default function FarmerRegistration() {
                       <li>Allow cooperative staff to verify your farm details</li>
                       <li>Receive payments through the provided banking details</li>
                       <li>Comply with cooperative rules and regulations</li>
+                      <li>Allow document verification by cooperative administrators</li>
+                      <li>Understand that uploaded documents will be reviewed within 24-48 hours</li>
                     </ul>
                   </div>
                   
@@ -386,6 +442,33 @@ export default function FarmerRegistration() {
                       I agree to the terms and conditions and privacy policy *
                     </Label>
                   </div>
+
+                  {/* Document Upload Summary */}
+                  {(formData.idCopy || formData.farmCertificate || formData.bankStatement) && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <h4 className="font-medium text-green-800 mb-2">Documents Ready for Upload</h4>
+                      <div className="space-y-1 text-sm text-green-700">
+                        {formData.idCopy && (
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4" />
+                            <span>National ID: {formData.idCopy.name}</span>
+                          </div>
+                        )}
+                        {formData.farmCertificate && (
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4" />
+                            <span>Farm Certificate: {formData.farmCertificate.name}</span>
+                          </div>
+                        )}
+                        {formData.bankStatement && (
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4" />
+                            <span>Bank Statement: {formData.bankStatement.name}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
