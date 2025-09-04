@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "DairySight - Cooperative Management System",
   description: "Complete dairy cooperative management solution",
-    generator: 'v0.app'
+    generator: 'Next.js'
 }
 
 export default function RootLayout({
