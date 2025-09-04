@@ -1,7 +1,3 @@
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
-import * as XLSX from "xlsx"
-
 "use client"
 
 import { useState, useEffect } from "react"
