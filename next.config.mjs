@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -22,6 +23,11 @@ const nextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'no-referrer-when-downgrade' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+
+          // ✅ Added CORS restrictions
+          { key: 'Access-Control-Allow-Origin', value: 'https://songatechnologies-dairysight.vercel.app' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
         ],
       },
     ]
@@ -29,3 +35,4 @@ const nextConfig = {
 }
 
 export default nextConfig
+
