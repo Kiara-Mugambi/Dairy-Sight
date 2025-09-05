@@ -21,7 +21,6 @@ interface Farmer {
   status: "active" | "pending" | "inactive"
 }
 
-// ----------------- Seeds -----------------
 const SEED_FARMERS: Farmer[] = [
   { id: "f1", firstName: "John", lastName: "Kamau", phone: "0712345678", location: "Thika", county: "Kiambu", status: "active" },
   { id: "f2", firstName: "Mary", lastName: "Wanjiku", phone: "0723456789", location: "Ruiru", county: "Kiambu", status: "pending" },
@@ -29,7 +28,6 @@ const SEED_FARMERS: Farmer[] = [
 
 const LS_FARMERS_KEY = "ds_farmers"
 
-// ----------------- Component -----------------
 export default function FarmersPage() {
   const [farmers, setFarmers] = useState<Farmer[]>([])
   const [showForm, setShowForm] = useState(false)
@@ -50,7 +48,7 @@ export default function FarmersPage() {
     const newFarmer: Farmer = {
       id: `${Date.now()}`,
       firstName, lastName, phone, location, county,
-      status: "pending"
+      status: "pending",
     }
     const next = [newFarmer, ...farmers]
     setFarmers(next)
@@ -67,9 +65,9 @@ export default function FarmersPage() {
   }
 
   const statusBadge = (status: Farmer["status"]) => {
-    if (status === "active") return <Badge className="bg-green-200 text-green-800">Active</Badge>
-    if (status === "pending") return <Badge className="bg-yellow-200 text-yellow-800">Pending</Badge>
-    return <Badge className="bg-red-200 text-red-800">Inactive</Badge>
+    if (status === "active") return <Badge className="bg-green-100 text-green-700">Active</Badge>
+    if (status === "pending") return <Badge className="bg-yellow-100 text-yellow-700">Pending</Badge>
+    return <Badge className="bg-red-100 text-red-700">Inactive</Badge>
   }
 
   return (
@@ -165,4 +163,3 @@ export default function FarmersPage() {
     </div>
   )
 }
-
