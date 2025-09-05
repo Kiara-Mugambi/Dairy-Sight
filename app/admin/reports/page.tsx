@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { BarChart3, TrendingUp, Users, Droplets, DollarSign, Calendar, Download } from "lucide-react"
+import { BarChart3, Download } from "lucide-react"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import * as XLSX from "xlsx"
@@ -30,7 +29,7 @@ interface ReportData {
   commission: number
   averageQuality: number
   monthlyGrowth: number
-  trends: { period: string; revenue: number; milk: number }[] // for charts
+  trends: { period: string; revenue: number; milk: number }[]
 }
 
 export default function ReportsPage() {
@@ -83,7 +82,7 @@ export default function ReportsPage() {
     return now.toISOString().replace("T", "_").replace(/:/g, "-").split(".")[0]
   }
 
-  // ---------- EXPORT FUNCTIONS ----------
+  // ---------- EXPORTS ----------
   const exportCSV = () => {
     if (!reportData) return
     const timestamp = getTimestamp()
@@ -155,7 +154,7 @@ export default function ReportsPage() {
     XLSX.writeFile(wb, `report-${selectedPeriod}-${timestamp}.xlsx`)
   }
 
-  // ---------- RENDER ----------
+  // ---------- UI ----------
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -170,11 +169,13 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
             <p className="text-gray-600">Comprehensive insights into your cooperative's performance</p>
           </div>
+
           <div className="flex items-center gap-4">
             <div className="flex gap-2">
               {["week", "month", "year"].map((p) => (
@@ -189,7 +190,7 @@ export default function ReportsPage() {
               ))}
             </div>
 
-            {/* Export dropdown */}
+            {/* Export */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button>
@@ -206,56 +207,47 @@ export default function ReportsPage() {
           </div>
         </div>
 
+        {/* Charts */}
         {reportData && (
-          <>
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {/* Revenue, Milk, Active Farmers, Commission cards (same as before)... */}
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Trend</CardTitle>
+                <CardDescription>Revenue over time</CardDescription>
+              </CardHeader>
+              <CardContent style={{ height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={reportData.trends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="period" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="revenue" stroke="#16a34a" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-            {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Revenue Trend</CardTitle>
-                  <CardDescription>Revenue over time</CardDescription>
-                </CardHeader>
-                <CardContent style={{ height: 300 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={reportData.trends}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="revenue" stroke="#16a34a" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Milk Intake Trend</CardTitle>
-                  <CardDescription>Milk intake over time</CardDescription>
-                </CardHeader>
-                <CardContent style={{ height: 300 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={reportData.trends}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="milk" fill="#2563eb" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* ... Quality + Performance summary (unchanged from before) ... */}
-          </>
+            <Card>
+              <CardHeader>
+                <CardTitle>Milk Intake Trend</CardTitle>
+                <CardDescription>Milk intake over time</CardDescription>
+              </CardHeader>
+              <CardContent style={{ height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={reportData.trends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="period" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="milk" fill="#2563eb" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>
