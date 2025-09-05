@@ -1,5 +1,6 @@
 "use client"
 
+console.log("Farmers page loaded");
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
