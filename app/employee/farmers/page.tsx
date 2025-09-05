@@ -5,74 +5,87 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Users, Search, Plus, Trash2, Briefcase } from "lucide-react"
+import { Users, Search, Plus, Trash2, MapPin, CheckCircle2, Ban } from "lucide-react"
 
-interface Employee {
+interface Farmer {
   id: string
-  name: string
-  role: string
+  firstName: string
+  lastName: string
   phone: string
-  status: "active" | "inactive"
+  county: string
+  deliveries: number
+  status: "active" | "pending" | "inactive"
 }
 
-export default function EmployeeDashboard() {
-  const [employees, setEmployees] = useState<Employee[]>([])
+export default function FarmerDashboard() {
+  const [farmers, setFarmers] = useState<Farmer[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [newEmployee, setNewEmployee] = useState({ name: "", role: "", phone: "" })
+  const [newFarmer, setNewFarmer] = useState({ firstName: "", lastName: "", phone: "", county: "" })
 
   useEffect(() => {
-    loadEmployees()
+    loadFarmers()
   }, [])
 
   // Mock / fallback data
-  const loadEmployees = async () => {
+  const loadFarmers = async () => {
     try {
-      const response = await fetch("/api/employees")
+      const response = await fetch("/api/farmers")
       if (response.ok) {
         const data = await response.json()
-        setEmployees(data)
+        setFarmers(data)
       } else {
         fallbackData()
       }
     } catch (error) {
-      console.error("Error loading employees:", error)
+      console.error("Error loading farmers:", error)
       fallbackData()
     }
   }
 
   const fallbackData = () => {
-    setEmployees([
-      { id: "1", name: "John Doe", role: "Field Officer", phone: "0712345678", status: "active" },
-      { id: "2", name: "Jane Smith", role: "Manager", phone: "0723456789", status: "active" },
-      { id: "3", name: "Peter Mwangi", role: "Clerk", phone: "0734567890", status: "inactive" },
+    setFarmers([
+      { id: "1", firstName: "Mary", lastName: "Wanjiku", phone: "0712345678", county: "Kiambu", deliveries: 120, status: "active" },
+      { id: "2", firstName: "James", lastName: "Otieno", phone: "0723456789", county: "Kisumu", deliveries: 45, status: "pending" },
+      { id: "3", firstName: "Peter", lastName: "Mwangi", phone: "0734567890", county: "Nyeri", deliveries: 78, status: "inactive" },
     ])
   }
 
-  // Add new employee
-  const addEmployee = () => {
-    if (!newEmployee.name || !newEmployee.role || !newEmployee.phone) return
-    const newEntry: Employee = {
+  // Add new farmer
+  const addFarmer = () => {
+    if (!newFarmer.firstName || !newFarmer.lastName || !newFarmer.phone || !newFarmer.county) return
+    const newEntry: Farmer = {
       id: Date.now().toString(),
-      name: newEmployee.name,
-      role: newEmployee.role,
-      phone: newEmployee.phone,
-      status: "active",
+      firstName: newFarmer.firstName,
+      lastName: newFarmer.lastName,
+      phone: newFarmer.phone,
+      county: newFarmer.county,
+      deliveries: 0,
+      status: "pending",
     }
-    setEmployees([...employees, newEntry])
-    setNewEmployee({ name: "", role: "", phone: "" })
+    setFarmers([...farmers, newEntry])
+    setNewFarmer({ firstName: "", lastName: "", phone: "", county: "" })
   }
 
-  // Remove employee
-  const removeEmployee = (id: string) => {
-    setEmployees(employees.filter((e) => e.id !== id))
+  // Remove farmer
+  const removeFarmer = (id: string) => {
+    setFarmers(farmers.filter((f) => f.id !== id))
   }
 
-  const filteredEmployees = employees.filter((e) =>
-    e.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Status update
+  const updateStatus = (id: string, newStatus: Farmer["status"]) => {
+    setFarmers(farmers.map((f) => (f.id === id ? { ...f, status: newStatus } : f)))
+  }
+
+  const filteredFarmers = farmers.filter(
+    (f) =>
+      `${f.firstName} ${f.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.phone.includes(searchTerm) ||
+      f.county.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const activeCount = employees.filter((e) => e.status === "active").length
-  const inactiveCount = employees.filter((e) => e.status === "inactive").length
+  const activeCount = farmers.filter((f) => f.status === "active").length
+  const pendingCount = farmers.filter((f) => f.status === "pending").length
+  const inactiveCount = farmers.filter((f) => f.status === "inactive").length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -80,30 +93,40 @@ export default function EmployeeDashboard() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Employee Operations</h1>
-            <p className="text-gray-600">Manage your cooperative's workforce</p>
+            <h1 className="text-3xl font-bold text-gray-900">Farmer Management</h1>
+            <p className="text-gray-600">Manage registered farmers in your cooperative</p>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Total Employees</CardTitle>
-              <CardDescription>All registered employees</CardDescription>
+              <CardTitle>Total Farmers</CardTitle>
+              <CardDescription>All registered farmers</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{employees.length}</p>
+              <p className="text-2xl font-bold">{farmers.length}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle>Active</CardTitle>
-              <CardDescription>Currently working</CardDescription>
+              <CardDescription>Currently supplying</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending</CardTitle>
+              <CardDescription>Awaiting approval</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
             </CardContent>
           </Card>
 
@@ -118,62 +141,94 @@ export default function EmployeeDashboard() {
           </Card>
         </div>
 
-        {/* Add Employee Form */}
+        {/* Add Farmer Form */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Add Employee</CardTitle>
-            <CardDescription>Register a new employee</CardDescription>
+            <CardTitle>Add Farmer</CardTitle>
+            <CardDescription>Register a new farmer</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col md:flex-row gap-4">
             <Input
-              placeholder="Full Name"
-              value={newEmployee.name}
-              onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+              placeholder="First Name"
+              value={newFarmer.firstName}
+              onChange={(e) => setNewFarmer({ ...newFarmer, firstName: e.target.value })}
             />
             <Input
-              placeholder="Role"
-              value={newEmployee.role}
-              onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+              placeholder="Last Name"
+              value={newFarmer.lastName}
+              onChange={(e) => setNewFarmer({ ...newFarmer, lastName: e.target.value })}
             />
             <Input
               placeholder="Phone Number"
-              value={newEmployee.phone}
-              onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
+              value={newFarmer.phone}
+              onChange={(e) => setNewFarmer({ ...newFarmer, phone: e.target.value })}
             />
-            <Button onClick={addEmployee}>
+            <Input
+              placeholder="County"
+              value={newFarmer.county}
+              onChange={(e) => setNewFarmer({ ...newFarmer, county: e.target.value })}
+            />
+            <Button onClick={addFarmer}>
               <Plus className="h-4 w-4 mr-2" /> Add
             </Button>
           </CardContent>
         </Card>
 
-        {/* Search + Employee List */}
+        {/* Search + Farmer List */}
         <div className="flex items-center mb-4">
           <Search className="h-5 w-5 text-gray-400 mr-2" />
           <Input
-            placeholder="Search employees..."
+            placeholder="Search farmers by name, phone, or county..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
+        {/* Farmer Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEmployees.map((employee) => (
-            <Card key={employee.id}>
+          {filteredFarmers.map((farmer) => (
+            <Card key={farmer.id}>
               <CardHeader className="flex justify-between items-center">
                 <div>
-                  <CardTitle>{employee.name}</CardTitle>
+                  <CardTitle>
+                    {farmer.firstName} {farmer.lastName}
+                  </CardTitle>
                   <CardDescription className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4" /> {employee.role}
+                    <MapPin className="h-4 w-4" /> {farmer.county}
                   </CardDescription>
                 </div>
-                <Badge variant={employee.status === "active" ? "default" : "destructive"}>
-                  {employee.status}
+                <Badge
+                  variant={
+                    farmer.status === "active"
+                      ? "default"
+                      : farmer.status === "pending"
+                      ? "secondary"
+                      : "destructive"
+                  }
+                >
+                  {farmer.status}
                 </Badge>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">📞 {employee.phone}</p>
-                <div className="flex justify-end mt-4">
-                  <Button variant="destructive" size="sm" onClick={() => removeEmployee(employee.id)}>
+                <p className="text-gray-600">📞 {farmer.phone}</p>
+                <p className="text-gray-600">🥛 Deliveries: {farmer.deliveries}</p>
+                <div className="flex justify-between mt-4">
+                  {farmer.status === "pending" && (
+                    <Button size="sm" onClick={() => updateStatus(farmer.id, "active")}>
+                      <CheckCircle2 className="h-4 w-4 mr-1" /> Approve
+                    </Button>
+                  )}
+                  {farmer.status === "active" && (
+                    <Button variant="secondary" size="sm" onClick={() => updateStatus(farmer.id, "inactive")}>
+                      <Ban className="h-4 w-4 mr-1" /> Deactivate
+                    </Button>
+                  )}
+                  {farmer.status === "inactive" && (
+                    <Button size="sm" onClick={() => updateStatus(farmer.id, "active")}>
+                      <CheckCircle2 className="h-4 w-4 mr-1" /> Reactivate
+                    </Button>
+                  )}
+                  <Button variant="destructive" size="sm" onClick={() => removeFarmer(farmer.id)}>
                     <Trash2 className="h-4 w-4 mr-1" /> Remove
                   </Button>
                 </div>
