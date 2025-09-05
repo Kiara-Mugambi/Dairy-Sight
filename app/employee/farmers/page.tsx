@@ -2,188 +2,185 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Users, Search, Droplets, TrendingUp, CheckCircle, AlertCircle, Calendar } from "lucide-react"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { Badge } from "@/components/ui/badge"
+import { Users, Search, Plus, Trash2, Briefcase } from "lucide-react"
 
-interface Farmer {
+interface Employee {
   id: string
   name: string
+  role: string
   phone: string
-  email: string
-  location: string
-  status: "pending" | "active" | "rejected"
-  registrationDate: string
-  totalDeliveries?: number
-  lastDelivery?: {
-    litres: number
-    time: string
-    quality: string
-  }
+  status: "active" | "inactive"
 }
 
 export default function EmployeeDashboard() {
-  const [farmers, setFarmers] = useState<Farmer[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Mock milk intake trend data
-  const [milkTrend, setMilkTrend] = useState([
-    { day: "Mon", litres: 850 },
-    { day: "Tue", litres: 920 },
-    { day: "Wed", litres: 780 },
-    { day: "Thu", litres: 1100 },
-    { day: "Fri", litres: 1020 },
-    { day: "Sat", litres: 980 },
-    { day: "Sun", litres: 1150 },
-  ])
+  const [newEmployee, setNewEmployee] = useState({ name: "", role: "", phone: "" })
 
   useEffect(() => {
-    loadFarmers()
+    loadEmployees()
   }, [])
 
-  const loadFarmers = async () => {
+  // Mock / fallback data
+  const loadEmployees = async () => {
     try {
-      setIsLoading(true)
-      const response = await fetch("/api/farmers")
+      const response = await fetch("/api/employees")
       if (response.ok) {
         const data = await response.json()
-        setFarmers(data.farmers || [])
+        setEmployees(data)
+      } else {
+        fallbackData()
       }
     } catch (error) {
-      console.error("Error loading farmers:", error)
-    } finally {
-      setIsLoading(false)
+      console.error("Error loading employees:", error)
+      fallbackData()
     }
   }
 
-  const filteredFarmers = farmers.filter((farmer) =>
-    farmer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    farmer.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    farmer.phone.includes(searchTerm)
+  const fallbackData = () => {
+    setEmployees([
+      { id: "1", name: "John Doe", role: "Field Officer", phone: "0712345678", status: "active" },
+      { id: "2", name: "Jane Smith", role: "Manager", phone: "0723456789", status: "active" },
+      { id: "3", name: "Peter Mwangi", role: "Clerk", phone: "0734567890", status: "inactive" },
+    ])
+  }
+
+  // Add new employee
+  const addEmployee = () => {
+    if (!newEmployee.name || !newEmployee.role || !newEmployee.phone) return
+    const newEntry: Employee = {
+      id: Date.now().toString(),
+      name: newEmployee.name,
+      role: newEmployee.role,
+      phone: newEmployee.phone,
+      status: "active",
+    }
+    setEmployees([...employees, newEntry])
+    setNewEmployee({ name: "", role: "", phone: "" })
+  }
+
+  // Remove employee
+  const removeEmployee = (id: string) => {
+    setEmployees(employees.filter((e) => e.id !== id))
+  }
+
+  const filteredEmployees = employees.filter((e) =>
+    e.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const activeFarmers = filteredFarmers.filter((f) => f.status === "active")
-  const pendingFarmers = filteredFarmers.filter((f) => f.status === "pending")
-
-  // Mock stats
-  const totalMilk = milkTrend.reduce((sum, d) => sum + d.litres, 0)
-  const avgQuality = 4.2
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Droplets className="h-12 w-12 text-blue-600 animate-pulse mx-auto mb-4" />
-        <p className="text-gray-600">Loading dashboard...</p>
-      </div>
-    )
-  }
+  const activeCount = employees.filter((e) => e.status === "active").length
+  const inactiveCount = employees.filter((e) => e.status === "inactive").length
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Employee Dashboard</h1>
-          <p className="text-gray-600">Real-time milk collection and farmer insights</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Employee Operations</h1>
+            <p className="text-gray-600">Manage your cooperative's workforce</p>
+          </div>
         </div>
 
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Milk Collected (This Week)</p>
-                <p className="text-3xl font-bold text-gray-900">{totalMilk.toLocaleString()} L</p>
-              </div>
-              <Droplets className="h-8 w-8 text-blue-600" />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Farmers</p>
-                <p className="text-3xl font-bold text-gray-900">{activeFarmers.length}</p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Avg Quality Score</p>
-                <p className="text-3xl font-bold text-gray-900">{avgQuality}/5.0</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-purple-600" />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Milk Intake Trend</CardTitle>
-              <CardDescription>Litres collected this week</CardDescription>
+              <CardTitle>Total Employees</CardTitle>
+              <CardDescription>All registered employees</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={milkTrend}>
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="litres" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <p className="text-2xl font-bold">{employees.length}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Farmer Contribution</CardTitle>
-              <CardDescription>Share of total milk collected</CardDescription>
+              <CardTitle>Active</CardTitle>
+              <CardDescription>Currently working</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie data={activeFarmers} dataKey="totalDeliveries" nameKey="name" outerRadius={100} label>
-                    {activeFarmers.map((_, i) => (
-                      <Cell key={i} fill={["#3b82f6", "#10b981", "#f59e0b", "#ef4444"][i % 4]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Inactive</CardTitle>
+              <CardDescription>Suspended or left</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-red-600">{inactiveCount}</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Deliveries Feed */}
-        <Card>
+        {/* Add Employee Form */}
+        <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Recent Deliveries</CardTitle>
-            <CardDescription>Latest farmer milk submissions</CardDescription>
+            <CardTitle>Add Employee</CardTitle>
+            <CardDescription>Register a new employee</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {activeFarmers.slice(0, 5).map((farmer) => (
-                <div key={farmer.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-900">{farmer.name}</p>
-                    <p className="text-sm text-gray-600">{farmer.lastDelivery?.time || "Today"} • {farmer.location}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-blue-600">{farmer.lastDelivery?.litres || 0} L</p>
-                    <Badge>{farmer.lastDelivery?.quality || "Grade A"}</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <CardContent className="flex flex-col md:flex-row gap-4">
+            <Input
+              placeholder="Full Name"
+              value={newEmployee.name}
+              onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+            />
+            <Input
+              placeholder="Role"
+              value={newEmployee.role}
+              onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+            />
+            <Input
+              placeholder="Phone Number"
+              value={newEmployee.phone}
+              onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
+            />
+            <Button onClick={addEmployee}>
+              <Plus className="h-4 w-4 mr-2" /> Add
+            </Button>
           </CardContent>
         </Card>
+
+        {/* Search + Employee List */}
+        <div className="flex items-center mb-4">
+          <Search className="h-5 w-5 text-gray-400 mr-2" />
+          <Input
+            placeholder="Search employees..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEmployees.map((employee) => (
+            <Card key={employee.id}>
+              <CardHeader className="flex justify-between items-center">
+                <div>
+                  <CardTitle>{employee.name}</CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4" /> {employee.role}
+                  </CardDescription>
+                </div>
+                <Badge variant={employee.status === "active" ? "default" : "destructive"}>
+                  {employee.status}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">📞 {employee.phone}</p>
+                <div className="flex justify-end mt-4">
+                  <Button variant="destructive" size="sm" onClick={() => removeEmployee(employee.id)}>
+                    <Trash2 className="h-4 w-4 mr-1" /> Remove
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   )
