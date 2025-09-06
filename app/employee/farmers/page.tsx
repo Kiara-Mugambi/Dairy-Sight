@@ -1,6 +1,5 @@
 "use client"
 
-console.log("Farmers page loaded");
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import * as Dialog from "@radix-ui/react-dialog"
 import { Plus, Trash2, X, Users } from "lucide-react"
 
+// Debug: confirm route is rendering
+console.log("✅ Farmers page loaded")
+
 // ----------------- Types -----------------
 interface Farmer {
   id: string
@@ -22,6 +24,7 @@ interface Farmer {
   county: string
   status: "active" | "pending" | "inactive"
 }
+
 
 // ----------------- Mock seed -----------------
 const SEED_FARMERS: Farmer[] = [
