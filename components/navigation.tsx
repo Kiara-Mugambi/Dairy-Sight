@@ -12,7 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Droplets, Home, Users, BarChart3, Settings, LogOut, User, Shield, Menu, X } from "lucide-react"
+import {
+  Droplets,
+  Home,
+  Users,
+  BarChart3,
+  Settings,
+  LogOut,
+  User,
+  Shield,
+  Menu,
+  X,
+  Package,
+  Truck,
+} from "lucide-react"
 
 interface User {
   email: string
@@ -66,7 +79,11 @@ export function Navigation() {
       : [
           { href: "/employee", label: "Dashboard", icon: Home },
           { href: "/employee/intake", label: "Milk Intake", icon: Droplets },
+          { href: "/employee/offtake", label: "Milk Offtake", icon: Truck },
+          { href: "/employee/inventory", label: "Inventory", icon: Package },
+          { href: "/employee/analytics", label: "Analytics", icon: BarChart3 },
           { href: "/employee/farmers", label: "Farmers", icon: Users },
+          { href: "/employee/reports", label: "Reports", icon: BarChart3 },
         ]
 
   return (
