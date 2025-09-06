@@ -69,22 +69,22 @@ export function Navigation() {
   }
 
   const navigationItems =
-    user.role === "admin"
-      ? [
-          { href: "/admin", label: "Dashboard", icon: Home },
-          { href: "/admin/farmers", label: "Farmers", icon: Users },
-          { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-          { href: "/admin/settings", label: "Settings", icon: Settings },
-        ]
-      : [
-          { href: "/employee", label: "Dashboard", icon: Home },
-          { href: "/employee/intake", label: "Milk Intake", icon: Droplets },
-          { href: "/employee/offtake", label: "Milk Offtake", icon: Truck },
-          { href: "/employee/inventory", label: "Inventory", icon: Package },
-          { href: "/employee/analytics", label: "Analytics", icon: BarChart3 },
-          { href: "/employee/farmers", label: "Farmers", icon: Users },
-          { href: "/employee/reports", label: "Reports", icon: BarChart3 },
-        ]
+  user.role === "admin"
+    ? [
+        { href: "/admin", label: "Dashboard", icon: Home },
+        { href: "/admin/farmers", label: "Farmers", icon: Users },
+        { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+        { href: "/admin/settings", label: "Settings", icon: Settings },
+      ]
+    : [
+        { href: "/employee", label: "Dashboard", icon: Home },
+        { href: "/employee/intake", label: "Milk Intake", icon: Droplets },
+        { href: "/employee/farmers", label: "Farmers", icon: Users },
+        { href: "/employee/offtake", label: "Milk Offtake", icon: Droplets },
+        { href: "/employee/inventory", label: "Inventory", icon: BarChart3 },
+        { href: "/employee/analytics", label: "Analytics", icon: TrendingUp },
+      ]
+
 
   return (
     <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
