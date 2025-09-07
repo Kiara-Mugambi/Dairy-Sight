@@ -25,7 +25,7 @@ import {
   X,
   Package,
   Truck,
-  TrendingUp,
+  TrendingUp, 
 } from "lucide-react"
 
 interface User {
