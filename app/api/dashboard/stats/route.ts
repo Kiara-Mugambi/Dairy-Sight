@@ -1,16 +1,26 @@
+// app/api/dashboard/stats/route.ts
 import { NextResponse } from "next/server"
-import { getFarmersData } from "@/app/actions/farmer-actions"
+import { getFarmers } from "@/app/actions/farmer-actions"
 
 export async function GET() {
   try {
-    const farmers = getFarmersData()
+    const result = await getFarmers()
 
-    // Calculate stats from farmers data
+    if (!result.success || !result.farmers) {
+      return NextResponse.json(
+        { error: result.error || "Failed to fetch farmers" },
+        { status: 500 }
+      )
+    }
+
+    const farmers = result.farmers
+
+    // ✅ Calculate stats from actual farmers data
     const totalFarmers = farmers.length
     const pendingFarmers = farmers.filter((f) => f.status === "pending").length
     const activeFarmers = farmers.filter((f) => f.status === "active").length
 
-    // Mock other stats - in a real app, these would come from your database
+    // ✅ Keep your mock stats for now
     const stats = {
       totalFarmers,
       pendingFarmers,
@@ -30,6 +40,9 @@ export async function GET() {
     return NextResponse.json(stats)
   } catch (error) {
     console.error("Error fetching dashboard stats:", error)
-    return NextResponse.json({ error: "Failed to fetch dashboard stats" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to fetch dashboard stats" },
+      { status: 500 }
+    )
   }
 }
