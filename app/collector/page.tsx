@@ -13,7 +13,7 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 
-// For now hardcode farmers (later replace with DB / API)
+// Temporary farmer list (replace with API later)
 const farmers = [
   { id: "1", name: "John Doe" },
   { id: "2", name: "Mary Wambui" },
@@ -35,12 +35,23 @@ export default function CollectorDashboard() {
   const [quality, setQuality] = useState("")
   const [date, setDate] = useState("")
 
+  // Fetch collections from API (instead of localStorage)
   useEffect(() => {
-    const saved = localStorage.getItem("collections")
-    if (saved) setCollections(JSON.parse(saved))
+    const fetchCollections = async () => {
+      try {
+        const res = await fetch("/api/collections")
+        if (res.ok) {
+          const data = await res.json()
+          setCollections(data)
+        }
+      } catch (err) {
+        console.error("Error fetching collections:", err)
+      }
+    }
+    fetchCollections()
   }, [])
 
-  const addCollection = (e: React.FormEvent) => {
+  const addCollection = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!farmer || !quantity || !quality || !date) {
@@ -55,20 +66,33 @@ export default function CollectorDashboard() {
       quality,
       date,
     }
-    const updated = [newEntry, ...collections]
-    setCollections(updated)
-    localStorage.setItem("collections", JSON.stringify(updated))
 
-    setFarmer("")
-    setQuantity(0)
-    setQuality("")
-    setDate("")
+    try {
+      const res = await fetch("/api/collections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newEntry),
+      })
+
+      if (res.ok) {
+        setCollections([newEntry, ...collections]) // update UI
+        setFarmer("")
+        setQuantity(0)
+        setQuality("")
+        setDate("")
+      } else {
+        console.error("Failed to save collection")
+      }
+    } catch (err) {
+      console.error("Error saving collection:", err)
+    }
   }
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Collector Dashboard</h1>
 
+      {/* Record Form */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Record Milk Collection</CardTitle>
@@ -137,6 +161,7 @@ export default function CollectorDashboard() {
         </CardContent>
       </Card>
 
+      {/* Records Table */}
       <Card>
         <CardHeader>
           <CardTitle>Collection Records</CardTitle>
