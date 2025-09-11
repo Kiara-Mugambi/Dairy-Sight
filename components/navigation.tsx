@@ -62,7 +62,7 @@ export function Navigation() {
     "/farmer/register",
     "/farmer/success",
     "/signup/success",
-    "/collectors/login", // ✅ collector login treated as public
+    "/collector/login", // ✅ collector login treated as public
   ]
   const isPublicPage = publicPages.some((page) => pathname.startsWith(page))
 
@@ -81,7 +81,7 @@ export function Navigation() {
         ]
       : user.role === "collector"
         ? [
-            { href: "/collectors/dashboard", label: "Dashboard", icon: ClipboardList }, // ✅ Collector menu
+            { href: "/collector", label: "Dashboard", icon: ClipboardList }, // ✅ matches your /app/collector/page.tsx
           ]
         : [
             { href: "/employee", label: "Dashboard", icon: Home },
@@ -102,7 +102,7 @@ export function Navigation() {
               user.role === "admin"
                 ? "/admin"
                 : user.role === "collector"
-                ? "/collectors/dashboard"
+                ? "/collector" // ✅ fixed
                 : "/employee"
             }
             className="flex items-center gap-2"
