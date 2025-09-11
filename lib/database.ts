@@ -257,5 +257,7 @@ export class Database {
 
     this.employees.push(newEmployee)
     return newEmployee
+    // ... all your existing code ...
   }
 }
+export const db = new Database(); // 
