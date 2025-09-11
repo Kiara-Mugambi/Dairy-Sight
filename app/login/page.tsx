@@ -26,28 +26,37 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok && data.success) {
-        // Store user info in localStorage (in production, use proper session management)
-        localStorage.setItem("user", JSON.stringify(data.user))
-
-        // Redirect based on role
-        if (data.user.role === "admin") {
-          router.push("/admin")
-        } else {
-          router.push("/employee")
-        }
+      // Demo credential check
+      let role = ""
+      if (email === "admin@dairy.com" && password === "admin123") {
+        role = "admin"
+      } else if (email === "employee@dairy.com" && password === "emp123") {
+        role = "employee"
+      } else if (email === "collector@dairy.com" && password === "col123") {
+        role = "collector"
       } else {
-        setError(data.error || "Login failed")
+        setError("Invalid email or password")
+        setIsLoading(false)
+        return
+      }
+
+      // Store user in localStorage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          email,
+          role,
+          name: email.split("@")[0],
+        })
+      )
+
+      // Redirect by role
+      if (role === "admin") {
+        router.push("/admin")
+      } else if (role === "employee") {
+        router.push("/employee")
+      } else if (role === "collector") {
+        router.push("/collector")
       }
     } catch (error) {
       console.error("Login error:", error)
@@ -134,6 +143,9 @@ export default function LoginPage() {
                 </p>
                 <p>
                   <strong>Employee:</strong> employee@dairy.com / emp123
+                </p>
+                <p>
+                  <strong>Collector:</strong> collector@dairy.com / col123
                 </p>
               </div>
             </div>
