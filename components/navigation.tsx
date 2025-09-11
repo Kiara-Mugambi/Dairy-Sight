@@ -26,6 +26,7 @@ import {
   Package,
   Truck,
   TrendingUp,
+  ClipboardList, // ✅ added for collectors
 } from "lucide-react"
 
 interface User {
@@ -61,6 +62,7 @@ export function Navigation() {
     "/farmer/register",
     "/farmer/success",
     "/signup/success",
+    "/collectors/login", // ✅ collector login treated as public
   ]
   const isPublicPage = publicPages.some((page) => pathname.startsWith(page))
 
@@ -68,6 +70,7 @@ export function Navigation() {
     return null
   }
 
+  // Role-based navigation
   const navigationItems =
     user.role === "admin"
       ? [
@@ -76,21 +79,34 @@ export function Navigation() {
           { href: "/admin/reports", label: "Reports", icon: BarChart3 },
           { href: "/admin/settings", label: "Settings", icon: Settings },
         ]
-      : [
-          { href: "/employee", label: "Dashboard", icon: Home },
-          { href: "/employee/intake", label: "Milk Intake", icon: Droplets },
-          { href: "/employee/farmers", label: "Farmers", icon: Users },
-          { href: "/employee/offtake", label: "Milk Offtake", icon: Truck },
-          { href: "/employee/inventory", label: "Inventory", icon: Package },
-          { href: "/employee/analytics", label: "Analytics", icon: TrendingUp },
-        ]
+      : user.role === "collector"
+        ? [
+            { href: "/collectors/dashboard", label: "Dashboard", icon: ClipboardList }, // ✅ Collector menu
+          ]
+        : [
+            { href: "/employee", label: "Dashboard", icon: Home },
+            { href: "/employee/intake", label: "Milk Intake", icon: Droplets },
+            { href: "/employee/farmers", label: "Farmers", icon: Users },
+            { href: "/employee/offtake", label: "Milk Offtake", icon: Truck },
+            { href: "/employee/inventory", label: "Inventory", icon: Package },
+            { href: "/employee/analytics", label: "Analytics", icon: TrendingUp },
+          ]
 
   return (
     <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href={user.role === "admin" ? "/admin" : "/employee"} className="flex items-center gap-2">
+          <Link
+            href={
+              user.role === "admin"
+                ? "/admin"
+                : user.role === "collector"
+                ? "/collectors/dashboard"
+                : "/employee"
+            }
+            className="flex items-center gap-2"
+          >
             <Droplets className="h-8 w-8 text-blue-600" />
             <span className="text-xl font-bold text-gray-900">DairySight</span>
           </Link>
@@ -105,7 +121,9 @@ export function Navigation() {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    isActive
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -122,6 +140,11 @@ export function Navigation() {
                 <>
                   <Shield className="h-3 w-3 mr-1" />
                   Admin
+                </>
+              ) : user.role === "collector" ? (
+                <>
+                  <ClipboardList className="h-3 w-3 mr-1" />
+                  Collector
                 </>
               ) : (
                 <>
@@ -190,7 +213,9 @@ export function Navigation() {
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium ${
-                      isActive ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      isActive
+                        ? "bg-blue-100 text-blue-700"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                     }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
