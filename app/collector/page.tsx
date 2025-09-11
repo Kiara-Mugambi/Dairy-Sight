@@ -13,29 +13,45 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 
-// Temporary farmer list (replace with API later)
-const farmers = [
-  { id: "1", name: "John Doe" },
-  { id: "2", name: "Mary Wambui" },
-  { id: "3", name: "Peter Mwangi" },
-]
+interface Farmer {
+  id: string
+  name: string
+}
 
 interface Collection {
   id: string
-  farmer: string
+  farmerId: string
+  farmerName: string
   quantity: number
   quality: string
   date: string
 }
 
 export default function CollectorDashboard() {
+  const [farmers, setFarmers] = useState<Farmer[]>([])
   const [collections, setCollections] = useState<Collection[]>([])
-  const [farmer, setFarmer] = useState("")
+  const [farmerId, setFarmerId] = useState("")
   const [quantity, setQuantity] = useState(0)
   const [quality, setQuality] = useState("")
   const [date, setDate] = useState("")
 
-  // Fetch collections from API (instead of localStorage)
+  // Fetch farmers
+  useEffect(() => {
+    const fetchFarmers = async () => {
+      try {
+        const res = await fetch("/api/farmers")
+        if (res.ok) {
+          const data = await res.json()
+          setFarmers(data)
+        }
+      } catch (err) {
+        console.error("Error fetching farmers:", err)
+      }
+    }
+    fetchFarmers()
+  }, [])
+
+  // Fetch collections
   useEffect(() => {
     const fetchCollections = async () => {
       try {
@@ -54,14 +70,16 @@ export default function CollectorDashboard() {
   const addCollection = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!farmer || !quantity || !quality || !date) {
+    if (!farmerId || !quantity || !quality || !date) {
       alert("Please fill all fields")
       return
     }
 
-    const newEntry: Collection = {
-      id: Date.now().toString(),
-      farmer,
+    const selectedFarmer = farmers.find((f) => f.id === farmerId)
+
+    const newEntry = {
+      farmerId,
+      farmerName: selectedFarmer?.name || "",
       quantity,
       quality,
       date,
@@ -75,8 +93,9 @@ export default function CollectorDashboard() {
       })
 
       if (res.ok) {
-        setCollections([newEntry, ...collections]) // update UI
-        setFarmer("")
+        const saved = await res.json()
+        setCollections([saved, ...collections]) // use API response
+        setFarmerId("")
         setQuantity(0)
         setQuality("")
         setDate("")
@@ -105,13 +124,13 @@ export default function CollectorDashboard() {
             {/* Farmer */}
             <div>
               <Label>Farmer</Label>
-              <Select value={farmer} onValueChange={setFarmer}>
+              <Select value={farmerId} onValueChange={setFarmerId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select farmer" />
                 </SelectTrigger>
                 <SelectContent>
                   {farmers.map((f) => (
-                    <SelectItem key={f.id} value={f.name}>
+                    <SelectItem key={f.id} value={f.id}>
                       {f.name}
                     </SelectItem>
                   ))}
@@ -179,7 +198,7 @@ export default function CollectorDashboard() {
             <tbody>
               {collections.map((c) => (
                 <tr key={c.id} className="border-t">
-                  <td className="py-2">{c.farmer}</td>
+                  <td className="py-2">{c.farmerName}</td>
                   <td className="py-2">{c.quantity}</td>
                   <td className="py-2">{c.quality}</td>
                   <td className="py-2">{c.date}</td>
