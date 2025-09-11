@@ -1,5 +1,16 @@
 "use server"
 
+interface Farmer {
+  id: string
+  name: string
+  phone: string
+  email: string
+  location: string
+  status: "pending" | "active" | "rejected"
+  registrationDate: string
+  cattleCount: number
+}
+
 interface ActionResult {
   success: boolean
   message?: string
@@ -7,7 +18,7 @@ interface ActionResult {
 }
 
 // In-memory storage for demonstration
-const farmers = [
+const farmers: Farmer[] = [
   {
     id: "1",
     name: "John Kamau",
@@ -60,12 +71,25 @@ const farmers = [
   },
 ]
 
-export async function getFarmers(): Promise<{ success: boolean; farmers?: any[]; error?: string }> {
+// This function already exists but is incorrectly named for the import
+export async function getFarmers(): Promise<{ success: boolean; farmers?: Farmer[]; error?: string }> {
   try {
     return { success: true, farmers }
   } catch (error) {
     console.error("Error getting farmers:", error)
     return { success: false, error: "Failed to get farmers" }
+  }
+}
+
+// ADD THIS FUNCTION - This is what your API route is trying to import
+export async function getFarmersData(): Promise<{ success: boolean; data?: Farmer[]; error?: string }> {
+  try {
+    // For now, return the same data as getFarmers
+    // You can modify this later to return different data if needed
+    return { success: true, data: farmers }
+  } catch (error) {
+    console.error("Error getting farmers data:", error)
+    return { success: false, error: "Failed to get farmers data" }
   }
 }
 
@@ -92,5 +116,18 @@ export async function rejectFarmer(farmerId: string): Promise<ActionResult> {
   } catch (error) {
     console.error("Error rejecting farmer:", error)
     return { success: false, error: "Failed to reject farmer" }
+  }
+}
+
+// Helper function to get a farmer by ID
+export async function getFarmerById(farmerId: string): Promise<{ success: boolean; farmer?: Farmer; error?: string }> {
+  try {
+    const farmer = farmers.find((f) => f.id === farmerId)
+    if (!farmer) return { success: false, error: "Farmer not found" }
+    
+    return { success: true, farmer }
+  } catch (error) {
+    console.error("Error getting farmer:", error)
+    return { success: false, error: "Failed to get farmer" }
   }
 }
