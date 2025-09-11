@@ -1,98 +1,90 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useState } from "react"
+import { farmers } from "@/data/farmers"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
-interface Collection {
-  id: string
-  farmer: string
-  quantity: number
-  date: string
-}
+export default function CollectorPage() {
+  const [farmerId, setFarmerId] = useState("")
+  const [quantity, setQuantity] = useState("")
+  const [quality, setQuality] = useState("")
 
-export default function CollectorDashboard() {
-  const [collections, setCollections] = useState<Collection[]>([])
-  const [farmer, setFarmer] = useState("")
-  const [quantity, setQuantity] = useState(0)
-  const [date, setDate] = useState("")
-
-  useEffect(() => {
-    const saved = localStorage.getItem("collections")
-    if (saved) setCollections(JSON.parse(saved))
-  }, [])
-
-  const addCollection = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const newEntry: Collection = {
-      id: Date.now().toString(),
-      farmer,
-      quantity,
-      date,
-    }
-    const updated = [newEntry, ...collections]
-    setCollections(updated)
-    localStorage.setItem("collections", JSON.stringify(updated))
 
-    setFarmer("")
-    setQuantity(0)
-    setDate("")
+    // Here connect to backend API / database
+    console.log({
+      farmerId,
+      quantity,
+      quality,
+    })
+
+    alert("Milk record submitted successfully!")
+    setFarmerId("")
+    setQuantity("")
+    setQuality("")
   }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Collector Dashboard</h1>
-
-      <Card className="mb-6">
+      <Card className="max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Record Milk Collection</CardTitle>
+          <CardTitle>Milk Collection Entry</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={addCollection} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Farmer select */}
             <div>
-              <Label>Farmer</Label>
-              <Input value={farmer} onChange={(e) => setFarmer(e.target.value)} />
+              <Label>Select Farmer</Label>
+              <Select value={farmerId} onValueChange={setFarmerId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a farmer" />
+                </SelectTrigger>
+                <SelectContent>
+                  {farmers.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      {f.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
+            {/* Quantity */}
             <div>
-              <Label>Quantity (L)</Label>
-              <Input type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} />
+              <Label>Milk Quantity (litres)</Label>
+              <Input
+                type="number"
+                placeholder="Enter litres"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                required
+              />
             </div>
+
+            {/* Quality */}
             <div>
-              <Label>Date</Label>
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              <Label>Milk Quality</Label>
+              <Select value={quality} onValueChange={setQuality}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select quality grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">Grade A</SelectItem>
+                  <SelectItem value="B">Grade B</SelectItem>
+                  <SelectItem value="C">Grade C</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-end">
-              <Button type="submit">Save</Button>
-            </div>
+
+            <Button type="submit" className="w-full">
+              Submit Entry
+            </Button>
           </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Collection Records</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left">
-                <th>Farmer</th>
-                <th>Quantity (L)</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {collections.map(c => (
-                <tr key={c.id} className="border-t">
-                  <td className="py-2">{c.farmer}</td>
-                  <td className="py-2">{c.quantity}</td>
-                  <td className="py-2">{c.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </CardContent>
       </Card>
     </div>
