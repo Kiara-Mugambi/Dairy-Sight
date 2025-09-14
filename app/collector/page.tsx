@@ -1,213 +1,199 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select"
+import { 
+  BarChart, 
+  Smartphone, 
+  Wallet, 
+  Shield, 
+  Clock 
+} from "lucide-react"
 
-interface Farmer {
-  id: string
-  name: string
-}
-
-interface Collection {
-  id: string
-  farmerId: string
-  farmerName: string
-  quantity: number
-  quality: string
-  date: string
-}
-
-export default function CollectorDashboard() {
-  const [farmers, setFarmers] = useState<Farmer[]>([])
-  const [collections, setCollections] = useState<Collection[]>([])
-  const [farmerId, setFarmerId] = useState("")
-  const [quantity, setQuantity] = useState(0)
-  const [quality, setQuality] = useState("")
-  const [date, setDate] = useState("")
-
-  // Fetch farmers
-  useEffect(() => {
-    const fetchFarmers = async () => {
-      try {
-        const res = await fetch("/api/farmers")
-        if (res.ok) {
-          const data = await res.json()
-          setFarmers(data)
-        }
-      } catch (err) {
-        console.error("Error fetching farmers:", err)
-      }
-    }
-    fetchFarmers()
-  }, [])
-
-  // Fetch collections
-  useEffect(() => {
-    const fetchCollections = async () => {
-      try {
-        const res = await fetch("/api/collections")
-        if (res.ok) {
-          const data = await res.json()
-          setCollections(data)
-        }
-      } catch (err) {
-        console.error("Error fetching collections:", err)
-      }
-    }
-    fetchCollections()
-  }, [])
-
-  const addCollection = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!farmerId || !quantity || !quality || !date) {
-      alert("Please fill all fields")
-      return
-    }
-
-    const selectedFarmer = farmers.find((f) => f.id === farmerId)
-
-    const newEntry = {
-      farmerId,
-      farmerName: selectedFarmer?.name || "",
-      quantity,
-      quality,
-      date,
-    }
-
-    try {
-      const res = await fetch("/api/collections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newEntry),
-      })
-
-      if (res.ok) {
-        const saved = await res.json()
-        setCollections([saved, ...collections]) // use API response
-        setFarmerId("")
-        setQuantity(0)
-        setQuality("")
-        setDate("")
-      } else {
-        console.error("Failed to save collection")
-      }
-    } catch (err) {
-      console.error("Error saving collection:", err)
-    }
-  }
-
+export default function GetStartedPage() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Collector Dashboard</h1>
-
-      {/* Record Form */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Record Milk Collection</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={addCollection}
-            className="grid grid-cols-1 md:grid-cols-5 gap-4"
+    <div className="bg-gray-50">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-teal-600 to-green-500 text-white py-24">
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-5xl font-bold mb-6"
           >
-            {/* Farmer */}
-            <div>
-              <Label>Farmer</Label>
-              <Select value={farmerId} onValueChange={setFarmerId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select farmer" />
-                </SelectTrigger>
-                <SelectContent>
-                  {farmers.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
-                      {f.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            Build Trust in Every Drop
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-xl mb-8 max-w-3xl mx-auto"
+          >
+            Track milk intake with full transparency, eliminate hidden deductions, 
+            and guarantee farmers fair payments through instant digital notifications 
+            and cashless transfers.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+              Get Started Today
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <h2 className="text-4xl font-bold text-center mb-16 text-gray-900">
+            Why Choose DairySight?
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <div className="h-12 w-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                  <Smartphone className="h-6 w-6 text-teal-600" />
+                </div>
+                <CardTitle>Collector Mobile App</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Collectors record milk quantity, quality, and timestamp in real-time. 
+                  Farmers receive SMS confirmations instantly — no more disputes, no hidden numbers.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 2 */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <div className="h-12 w-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                  <Clock className="h-6 w-6 text-teal-600" />
+                </div>
+                <CardTitle>Freshness Guarantee</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Each delivery is tracked with a 3-hour freshness countdown. 
+                  Milk past its window is automatically flagged, protecting quality and buyers' trust.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 3 */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <div className="h-12 w-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                  <Wallet className="h-6 w-6 text-teal-600" />
+                </div>
+                <CardTitle>Cashless Payments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Payments are digital and instant. Offtakers pay online, our system deducts 
+                  5% commission automatically, and the cooperative or farmer receives funds instantly.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 4 */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <div className="h-12 w-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-teal-600" />
+                </div>
+                <CardTitle>Transparency & Trust</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Every liter is timestamped, visible, and verified. 
+                  No guesswork, no delayed records — building confidence 
+                  across farmers, cooperatives, and offtakers.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 5 */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <div className="h-12 w-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                  <BarChart className="h-6 w-6 text-teal-600" />
+                </div>
+                <CardTitle>Smart Dashboards</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Monitor collections, payments, and performance metrics in one place. 
+                  Data-driven decisions help you scale faster with clarity.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <h2 className="text-4xl font-bold text-center mb-16 text-gray-900">
+            How It Works
+          </h2>
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="h-16 w-16 mx-auto bg-teal-100 rounded-full flex items-center justify-center mb-6">
+                <Smartphone className="h-8 w-8 text-teal-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Record & Confirm</h3>
+              <p className="text-gray-600">
+                Collectors record milk via app, farmers get SMS confirmation 
+                with volume and timestamp instantly.
+              </p>
             </div>
 
-            {/* Quantity */}
-            <div>
-              <Label>Quantity (L)</Label>
-              <Input
-                type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-              />
+            <div className="text-center">
+              <div className="h-16 w-16 mx-auto bg-teal-100 rounded-full flex items-center justify-center mb-6">
+                <Clock className="h-8 w-8 text-teal-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Track Freshness</h3>
+              <p className="text-gray-600">
+                Each delivery has a 3-hour freshness countdown. Expired milk 
+                is flagged automatically, ensuring only quality supply moves forward.
+              </p>
             </div>
 
-            {/* Quality */}
-            <div>
-              <Label>Quality</Label>
-              <Select value={quality} onValueChange={setQuality}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select grade" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="A">Grade A</SelectItem>
-                  <SelectItem value="B">Grade B</SelectItem>
-                  <SelectItem value="C">Grade C</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="text-center">
+              <div className="h-16 w-16 mx-auto bg-teal-100 rounded-full flex items-center justify-center mb-6">
+                <Wallet className="h-8 w-8 text-teal-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Get Paid Instantly</h3>
+              <p className="text-gray-600">
+                Offtakers pay digitally, system deducts commission, and 
+                cooperatives or farmers receive their money instantly.
+              </p>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Date */}
-            <div>
-              <Label>Date</Label>
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-
-            <div className="flex items-end">
-              <Button type="submit">Save</Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Records Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Collection Records</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left">
-                <th>Farmer</th>
-                <th>Quantity (L)</th>
-                <th>Quality</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {collections.map((c) => (
-                <tr key={c.id} className="border-t">
-                  <td className="py-2">{c.farmerName}</td>
-                  <td className="py-2">{c.quantity}</td>
-                  <td className="py-2">{c.quality}</td>
-                  <td className="py-2">{c.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+      {/* CTA Section */}
+      <section className="py-20 bg-teal-600 text-white text-center">
+        <div className="container mx-auto px-6">
+          <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Dairy?</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Join cooperatives and farmers building trust and scaling income 
+            with transparency, freshness guarantees, and cashless payments.
+          </p>
+          <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+            Get Started Now
+          </Button>
+        </div>
+      </section>
     </div>
   )
 }
