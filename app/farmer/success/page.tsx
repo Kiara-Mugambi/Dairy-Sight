@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { CheckCircle, Phone, Mail, Calendar, MapPin, ArrowRight, Droplets } from 'lucide-react'
+import { CheckCircle, MessageSquare, Phone, Mail, ArrowRight, Droplets } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { SearchParamsWrapper } from "@/components/search-params-wrapper"
 
-function SuccessContent() {
+export default function RegistrationSuccess() {
   const searchParams = useSearchParams()
   const [farmerData, setFarmerData] = useState({
     id: '',
@@ -26,7 +25,7 @@ function SuccessContent() {
   }, [searchParams])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
@@ -57,61 +56,131 @@ function SuccessContent() {
               Please save these details for your records
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900">{farmerData.name}</h3>
-              <Badge variant="secondary" className="mt-1">
-                Farmer ID: {farmerData.id}
-              </Badge>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <Phone className="h-4 w-4 text-gray-600" />
-                <span className="text-sm text-gray-700">{farmerData.phone}</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <MapPin className="h-4 w-4 text-gray-600" />
-                <span className="text-sm text-gray-700">Location: Kenya</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <Calendar className="h-4 w-4 text-gray-600" />
-                <span className="text-sm text-gray-700">Registered: {new Date().toLocaleDateString()}</span>
+          <CardContent className="space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="text-center">
+                <Badge className="mb-2 bg-blue-600">Farmer ID</Badge>
+                <div className="text-3xl font-bold text-blue-600 mb-2">{farmerData.id}</div>
+                <p className="text-sm text-blue-700">
+                  This is your unique farmer identification number. You'll need this for all transactions.
+                </p>
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 mb-2">What's Next?</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Your registration is under review</li>
-                <li>• You'll receive SMS confirmation within 24 hours</li>
-                <li>• Admin will verify your documents</li>
-                <li>• Start delivering milk once approved</li>
-              </ul>
+            <div className="grid gap-4">
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-600">Name:</span>
+                <span className="font-medium">{farmerData.name}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-600">Phone:</span>
+                <span className="font-medium">{farmerData.phone}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-600">Status:</span>
+                <Badge variant="secondary">Pending Approval</Badge>
+              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h4 className="font-medium text-yellow-800 mb-2">Important:</h4>
-              <p className="text-sm text-yellow-700">
-                Save your Farmer ID: <strong>{farmerData.id}</strong>. You'll need this for all future transactions.
+        <Card className="shadow-xl border-0 mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-green-600" />
+              SMS Confirmation Sent
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-green-800 text-sm">
+                📱 <strong>SMS sent to {farmerData.phone}</strong>
+              </p>
+              <p className="text-green-700 text-sm mt-2">
+                "Welcome to DairySight! Your Farmer ID is {farmerData.id}. Your registration is under review. 
+                You'll receive another SMS once approved. Contact support: +254700123456"
               </p>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="flex gap-2">
-              <Button className="flex-1">
-                <Phone className="h-4 w-4 mr-2" />
-                Contact Support
-              </Button>
-              <Button variant="outline" className="flex-1">
-                <Mail className="h-4 w-4 mr-2" />
-                Email Copy
-              </Button>
+        <Card className="shadow-xl border-0 mb-8">
+          <CardHeader>
+            <CardTitle>What Happens Next?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  1
+                </div>
+                <div>
+                  <h4 className="font-medium">Document Review</h4>
+                  <p className="text-sm text-gray-600">
+                    Our team will review your submitted documents and farm details within 24-48 hours.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  2
+                </div>
+                <div>
+                  <h4 className="font-medium">SMS Notification</h4>
+                  <p className="text-sm text-gray-600">
+                    You'll receive an SMS confirmation once your registration is approved or if additional information is needed.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  3
+                </div>
+                <div>
+                  <h4 className="font-medium">Start Delivering</h4>
+                  <p className="text-sm text-gray-600">
+                    Once approved, you can start delivering milk to the cooperative and earning through our platform.
+                  </p>
+                </div>
+              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="text-center">
-              <p className="text-xs text-gray-500">
-                Questions? Call our support line: <strong>+254 700 123 456</strong>
-              </p>
+        <Card className="shadow-xl border-0 mb-8">
+          <CardHeader>
+            <CardTitle>Need Help?</CardTitle>
+            <CardDescription>
+              Contact us if you have any questions about your registration
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                <Phone className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="font-medium text-blue-800">Call Support</p>
+                  <p className="text-sm text-blue-600">+254700123456</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                <MessageSquare className="h-5 w-5 text-green-600" />
+                <div>
+                  <p className="font-medium text-green-800">WhatsApp</p>
+                  <p className="text-sm text-green-600">+254700123456</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg md:col-span-2">
+                <Mail className="h-5 w-5 text-purple-600" />
+                <div>
+                  <p className="font-medium text-purple-800">Email Support</p>
+                  <p className="text-sm text-purple-600">support@dairysight.com</p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -125,13 +194,5 @@ function SuccessContent() {
         </div>
       </main>
     </div>
-  )
-}
-
-export default function RegistrationSuccess() {
-  return (
-    <SearchParamsWrapper>
-      <SuccessContent />
-    </SearchParamsWrapper>
   )
 }

@@ -6,9 +6,9 @@ import Link from "next/link"
 import { CheckCircle, Building2, User, ArrowRight, Droplets } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { SearchParamsWrapper } from "@/components/search-params-wrapper"
+import { Badge } from "@/components/ui/badge"
 
-function SuccessContent() {
+export default function SignupSuccess() {
   const searchParams = useSearchParams()
   const [accountType, setAccountType] = useState('cooperative')
 
@@ -153,13 +153,5 @@ function SuccessContent() {
         </div>
       </main>
     </div>
-  )
-}
-
-export default function SignupSuccess() {
-  return (
-    <SearchParamsWrapper>
-      <SuccessContent />
-    </SearchParamsWrapper>
   )
 }
